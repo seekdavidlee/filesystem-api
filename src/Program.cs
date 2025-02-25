@@ -2,7 +2,10 @@ using FileSystemApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 builder.Services.AddSingleton<DbProvider>();
 builder.Services.AddControllers();
@@ -18,7 +21,7 @@ if (apiListenPortStr is not null && int.TryParse(apiListenPortStr, out var apiLi
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseCors("AllowAllOrigins");
 
 app.MapControllers();
 
