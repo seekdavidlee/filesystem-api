@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development",
+            "REDIS_CONNECTION_STRING": ""
+        },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5169"
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json"
+}
