@@ -1,5 +1,7 @@
-﻿using FileSystemApi.Services;
+﻿using FileSystemApi.Models;
+using FileSystemApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace FileSystemApi.Controllers;
 
@@ -44,6 +46,7 @@ public class StorageFilesController(ILogger<StorageFilesController> logger, DbPr
         var fileId = Guid.NewGuid().ToString("N");
         await System.IO.File.WriteAllTextAsync($"{storageLocation}/{fileId}", fileContent, cancellationToken);
         await provider.Database.StringSetAsync(path, fileId);
+        await System.IO.File.WriteAllTextAsync($"{storageLocation}/{fileId}.info.json", JsonSerializer.Serialize(new StorageFileInfo(path)), cancellationToken);
         return Accepted();
     }
 
@@ -105,6 +108,13 @@ public class StorageFilesController(ILogger<StorageFilesController> logger, DbPr
                 {
                     logger.LogInformation("deleting file {path}", filePath);
                     System.IO.File.Delete(filePath);
+                }
+
+                var fileInfoPath = $"{filePath}.info.json";
+                if (System.IO.File.Exists(fileInfoPath))
+                {
+                    logger.LogInformation("deleting file info {path}", fileInfoPath);
+                    System.IO.File.Delete(fileInfoPath);
                 }
             }
             await provider.Database.KeyDeleteAsync(key);
