@@ -28,6 +28,11 @@ namespace FileSystemApi.Controllers
         {
             using var ms = new StreamReader(Request.Body);
             var fileContent = await ms.ReadToEndAsync();
+            if (string.IsNullOrEmpty(fileContent))
+            {
+                logger.LogError("empty file content is invalid");
+                return BadRequest("empty file content is invalid");
+            }
             await provider.Database.StringSetAsync(path, fileContent.ToString());
             return Accepted();
         }
@@ -36,6 +41,13 @@ namespace FileSystemApi.Controllers
         public async Task<IActionResult> Get([FromQuery] string path)
         {
             var result = await provider.Database.StringGetAsync(path);
+
+            if (!result.HasValue || result.IsNullOrEmpty)
+            {
+                logger.LogWarning("key {path} contains empty value", path);
+                return NotFound();
+            }
+
             return Ok(result.ToString());
         }
 
